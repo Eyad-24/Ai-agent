@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from serpapi import GoogleSearch
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
+from services.logging_service import log_search
 
 load_dotenv()  # Loads SERPAPI_API_KEY from .env
 
@@ -55,6 +56,13 @@ def search_products(user_query: str) -> list[dict]:
             {"title": title, "price": price, "rating": rating, "link": link}
         )
         
+    # Recording the query in the database
+    log_search(
+        user_id=1,               
+        query=user_query,
+        result_count=len(top_matches)
+    )
+    
     return top_matches
 
 # 2- AI suggestion helper
