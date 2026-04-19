@@ -1,17 +1,15 @@
 from database.db_connection import get_connection
 
-def log_search(user_id, query, result_count):
+def log_search(user_id, query, result_count, source):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        INSERT INTO search_logs (user_id, query, result_count)
-        VALUES (%s, %s, %s)
-        """,
-        (user_id, query, result_count)
-    )
-
+    sql = """
+        INSERT INTO search_logs (user_id, query, result_count, source)
+        VALUES (%s, %s, %s, %s)
+    """
+    cur.execute(sql, (user_id, query, result_count, source))
     conn.commit()
+    
     cur.close()
     conn.close()

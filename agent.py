@@ -4,6 +4,8 @@ from serpapi import GoogleSearch
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from services.logging_service import log_search
+from services.product_search import search_products_db, search_products
+
 
 load_dotenv()  # Loads SERPAPI_API_KEY from .env
 
@@ -11,6 +13,20 @@ load_dotenv()  # Loads SERPAPI_API_KEY from .env
 def search_products(user_query: str) -> list[dict]:
     """Return up to 5 product dicts with title, price, rating, link."""
 
+    # 1: Search in local database first (Primary source)
+    db_results = search_products_db(user_query)
+
+    if db_results:
+        # Log the query using database results
+        log_search(
+            user_id=1,
+            query=user_query,
+            result_count=len(db_results),
+            source="database"
+        )
+        return db_results
+
+    # 2: Fallback to SerpAPI if no database results found
     api_key = os.getenv("SERPAPI_API_KEY")
     
     if not api_key:
@@ -60,7 +76,8 @@ def search_products(user_query: str) -> list[dict]:
     log_search(
         user_id=1,               
         query=user_query,
-        result_count=len(top_matches)
+        result_count=len(top_matches),
+        source="serpapi"
     )
     
     return top_matches
