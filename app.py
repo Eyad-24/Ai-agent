@@ -12,7 +12,7 @@ query = st.text_input("What do you need? (e.g. wireless headphones under $100)",
 
 if query:
     try:
-        with st.spinner("🤖 Thinking..."):
+        with st.spinner(" Thinking..."):
             suggestion = generate_ai_suggestion(query)
             products = search_products(query)
 
